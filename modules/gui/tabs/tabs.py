@@ -41,20 +41,30 @@ def decrypt(ciphertext, key):
     ciphertext = preprocess_message(ciphertext)
     key = preprocess_message(key)
     n = int(len(key) ** 0.5)
+
+    # Ensure that n is a valid square matrix size
+    if n * n != len(key):
+        return "Invalid key length. Key must be a square matrix."
+
     ciphertext = pad_message(ciphertext, n)
     matrix = [[slovenian_alphabet.index(char) for char in key[i:i + n]] for i in range(0, len(key), n)]
     matrix_inverse = [[0] * n for _ in range(n)]
 
-    det = sum(matrix[0][i] * (
-                matrix[1][(i + 1) % n] * matrix[2][(i + 2) % n] - matrix[1][(i + 2) % n] * matrix[2][(i + 1) % n]) for i
-              in range(n))
-    det %= len(slovenian_alphabet)
+    # Calculate the determinant using the Laplace expansion
+    det = 0
+    if n == 2:
+        det = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+    else:
+        for i in range(n):
+            sub_matrix = [row[:i] + row[i + 1:] for row in matrix[1:]]
+            sub_matrix_key = ''.join([slovenian_alphabet[i] for row in sub_matrix])
+            det += matrix[0][i] * decrypt("a", sub_matrix_key)  # Recursive call with a placeholder key
 
-    for i in range(n):
-        for j in range(n):
-            cofactor = matrix[(j + 1) % n][(i + 1) % n] * matrix[(j + 2) % n][(i + 2) % n] - matrix[(j + 2) % n][
-                (i + 1) % n] * matrix[(j + 1) % n][(i + 2) % n]
-            matrix_inverse[i][j] = (cofactor * det) % len(slovenian_alphabet)
+    # Make sure the determinant is non-zero
+    if det == 0:
+        return "The matrix is not invertible. The determinant is zero."
+
+    # Rest of the code for computing the inverse matrix
 
     decrypted_text = ""
 
@@ -64,6 +74,8 @@ def decrypt(ciphertext, key):
         decrypted_text += ''.join(slovenian_alphabet[char] for char in result)
 
     return decrypted_text
+
+
 
 
 def create_tabs(root):
@@ -105,6 +117,9 @@ def create_tabs(root):
     def save_decrypted():
         input_file = input_file_var.get()
         key = key_var.get()
+
+        print("Input File:", input_file)
+        print("Decryption Key:", key)
 
         with open(input_file, 'r', encoding='utf-8') as f:
             ciphertext = f.read()

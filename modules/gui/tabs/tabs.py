@@ -2,17 +2,29 @@ import tkinter as tk
 from tkinter import ttk, filedialog
 import os
 
-# Slovenian alphabet
-slovenian_alphabet = "ABCČDEFGHIJKLMNOPRSŠTUZŽ"
+# Slovenian alphabet (lowercase)
+slovenian_alphabet = "abcčdefghijklmnoprsštuvzž"
 
+# Function to convert a message to uppercase and remove characters not in the alphabet
+def preprocess_message(message):
+    message = message.lower()
+    message = ''.join(char for char in message if char in slovenian_alphabet)
+    return message
+
+# Function to pad the message to match the matrix size
+def pad_message(message, matrix_size):
+    while len(message) % matrix_size != 0:
+        message += 'a'  # You can use any character for padding
+    return message
 
 # Hill cipher encryption function for Slovenian alphabet
 def encrypt(plaintext, key):
-    key = key.replace(" ", "").upper()
+    plaintext = preprocess_message(plaintext)
+    key = preprocess_message(key)
     n = int(len(key) ** 0.5)
-    # Ensure the key length is sufficient for a square matrix
+    plaintext = pad_message(plaintext, n)
     while len(key) < n * n:
-        key += "A"  # You can use any character for padding
+        key += "a"
 
     matrix = [[slovenian_alphabet.index(char) for char in key[i:i + n]] for i in range(0, len(key), n)]
     encrypted_text = ""
@@ -24,11 +36,12 @@ def encrypt(plaintext, key):
 
     return encrypted_text
 
-
 # Hill cipher decryption function for Slovenian alphabet
 def decrypt(ciphertext, key):
-    key = key.replace(" ", "").upper()
+    ciphertext = preprocess_message(ciphertext)
+    key = preprocess_message(key)
     n = int(len(key) ** 0.5)
+    ciphertext = pad_message(ciphertext, n)
     matrix = [[slovenian_alphabet.index(char) for char in key[i:i + n]] for i in range(0, len(key), n)]
     matrix_inverse = [[0] * n for _ in range(n)]
 

@@ -1,6 +1,6 @@
 from tkinter import filedialog
 import os
-
+import tkinter as tk
 from modules.crypto.decrypt import decrypt
 from modules.crypto.encrypt import encrypt
 
@@ -11,7 +11,7 @@ def open_file(file_var):
         file_var.set(file_path)
 
 
-def update_preview(file_var, text_widget, tk):
+def update_preview(file_var, text_widget):
     file_path = file_var.get()
     if file_path:
         try:

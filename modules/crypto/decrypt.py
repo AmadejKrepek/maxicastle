@@ -1,7 +1,6 @@
 
 from modules.crypto.utils.utils import preprocess_message, pad_message
-slovenian_alphabet = "abcčdefghijklmnoprsštuvzž"
-
+from modules.crypto.constants import alphabet
 # Hill cipher decryption function for Slovenian alphabet
 def decrypt(ciphertext, key):
     ciphertext = preprocess_message(ciphertext)
@@ -13,7 +12,7 @@ def decrypt(ciphertext, key):
         return "Invalid key length. Key must be a square matrix."
 
     ciphertext = pad_message(ciphertext, n)
-    matrix = [[slovenian_alphabet.index(char) for char in key[i:i + n]] for i in range(0, len(key), n)]
+    matrix = [[alphabet.SLOVENIAN_ALPHABET.index(char) for char in key[i:i + n]] for i in range(0, len(key), n)]
     matrix_inverse = [[0] * n for _ in range(n)]
 
     # Calculate the determinant using the Laplace expansion
@@ -23,7 +22,7 @@ def decrypt(ciphertext, key):
     else:
         for i in range(n):
             sub_matrix = [row[:i] + row[i + 1:] for row in matrix[1:]]
-            sub_matrix_key = ''.join([slovenian_alphabet[i] for row in sub_matrix])
+            sub_matrix_key = ''.join([alphabet.SLOVENIAN_ALPHABET[i] for row in sub_matrix])
             det += matrix[0][i] * decrypt("a", sub_matrix_key)  # Recursive call with a placeholder key
 
     # Make sure the determinant is non-zero
@@ -35,8 +34,8 @@ def decrypt(ciphertext, key):
     decrypted_text = ""
 
     for i in range(0, len(ciphertext), n):
-        block = [slovenian_alphabet.index(char) for char in ciphertext[i:i + n]]
-        result = [sum(matrix_inverse[i][j] * block[j] for j in range(n)) % len(slovenian_alphabet) for i in range(n)]
-        decrypted_text += ''.join(slovenian_alphabet[char] for char in result)
+        block = [alphabet.SLOVENIAN_ALPHABET.index(char) for char in ciphertext[i:i + n]]
+        result = [sum(matrix_inverse[i][j] * block[j] for j in range(n)) % len(alphabet.SLOVENIAN_ALPHABET) for i in range(n)]
+        decrypted_text += ''.join(alphabet.SLOVENIAN_ALPHABET[char] for char in result)
 
     return decrypted_text

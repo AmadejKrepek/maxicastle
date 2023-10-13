@@ -49,7 +49,6 @@ def create_tabs(root):
     ttk.Entry(encryption_frame, textvariable=key_var, width=20).grid(column=1, row=1, padx=10, pady=5)
     ttk.Button(encryption_frame, text="Add File for Encryption", command=lambda: open_file(input_file_var)).grid(
         column=2, row=0, padx=10, pady=5)
-    ttk.Button(encryption_frame, text="Encrypt File", command=save_encrypted).grid(column=1, row=2, padx=10, pady=5)
 
     # Decryption controls
     ttk.Label(decryption_frame, text="Input File").grid(column=0, row=0, padx=10, pady=5, sticky="w")
@@ -59,7 +58,6 @@ def create_tabs(root):
     ttk.Entry(decryption_frame, textvariable=key_var, width=20).grid(column=1, row=1, padx=10, pady=5)
     ttk.Button(decryption_frame, text="Add File for Decryption", command=lambda: open_file(input_file_var)).grid(
         column=2, row=0, padx=10, pady=5)
-    ttk.Button(decryption_frame, text="Decrypt File", command=save_decrypted).grid(column=1, row=2, padx=10, pady=5)
 
     # Create text boxes for file previews
     ttk.Label(tab1, text="Preview of Encrypted File").grid(column=0, row=2, padx=60, pady=10)
@@ -69,3 +67,14 @@ def create_tabs(root):
     ttk.Label(tab1, text="Preview of Decrypted File").grid(column=1, row=2, padx=60, pady=10)
     preview_text_box_decrypted = tk.Text(tab1, wrap=tk.WORD, height=10, width=40)
     preview_text_box_decrypted.grid(column=1, row=3, padx=60, pady=10)
+
+    # Define button with lambda function to pass arguments
+    ttk.Button(encryption_frame, text="Encrypt File",
+               command=lambda: save_encrypted(input_file_var, key_var, output_file_encrypted_var,
+                                              preview_text_box_encrypted)
+               ).grid(column=1, row=2, padx=10, pady=5)
+
+    ttk.Button(decryption_frame, text="Decrypt File",
+               command=lambda: save_decrypted(input_file_var, key_var, output_file_decrypted_var,
+                                              preview_text_box_decrypted)
+               ).grid(column=1, row=2, padx=10, pady=5)

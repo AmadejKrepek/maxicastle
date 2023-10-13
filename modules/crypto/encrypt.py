@@ -1,6 +1,6 @@
 from modules.crypto.utils.utils import preprocess_message, pad_message
 
-slovenian_alphabet = "abcčdefghijklmnoprsštuvzž"
+from modules.crypto.constants import alphabet
 
 
 # Hill cipher encryption function for Slovenian alphabet
@@ -12,12 +12,12 @@ def encrypt(plaintext, key):
     while len(key) < n * n:
         key += "a"
 
-    matrix = [[slovenian_alphabet.index(char) for char in key[i:i + n]] for i in range(0, len(key), n)]
+    matrix = [[alphabet.SLOVENIAN_ALPHABET.index(char) for char in key[i:i + n]] for i in range(0, len(key), n)]
     encrypted_text = ""
 
     for i in range(0, len(plaintext), n):
-        block = [slovenian_alphabet.index(char) for char in plaintext[i:i + n]]
-        result = [sum(matrix[i][j] * block[j] for j in range(n)) % len(slovenian_alphabet) for i in range(n)]
-        encrypted_text += ''.join(slovenian_alphabet[char] for char in result)
+        block = [alphabet.SLOVENIAN_ALPHABET.index(char) for char in plaintext[i:i + n]]
+        result = [sum(matrix[i][j] * block[j] for j in range(n)) % len(alphabet.SLOVENIAN_ALPHABET) for i in range(n)]
+        encrypted_text += ''.join(alphabet.SLOVENIAN_ALPHABET[char] for char in result)
 
     return encrypted_text

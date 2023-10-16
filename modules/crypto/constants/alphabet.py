@@ -1,1 +1,1 @@
-SLOVENIAN_ALPHABET = "abcčdefghijklmnoprsštuvzžq"
+SLOVENIAN_ALPHABET = "abcčdefghijklmnoprsštuvzž"

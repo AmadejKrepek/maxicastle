@@ -44,12 +44,12 @@ def encrypt(plaintext, key, modulus=25):
     key = preprocess_message(key)
     n = int(len(key) ** 0.5)
 
+    if n < 2:
+        return False, "Error: The key is too short to create a square matrix."
+
     if len(plaintext) % n != 0:
         # If not, pad the plaintext to make it a whole number of blocks
         plaintext = pad_message(plaintext, n)
-
-    if n < 2:
-        return False, "Error: The key is too short to create a square matrix."
 
     matrix = [[alphabet.SLOVENIAN_ALPHABET.index(char) for char in key[i:i + n]] for i in range(0, len(key), n)]
 

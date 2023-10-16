@@ -22,9 +22,20 @@ def update_preview(encrypted_text, text_widget):
             text_widget.insert(tk.END, f"Error reading: {str(e)}")
 
 
+def is_valid_input_file(input_file):
+    if not os.path.exists(input_file):
+        return False
+    return True
+
+
 def save_encrypted(input_file_var, key_var, output_file_encrypted_var, preview_text_box_encrypted):
     input_file = input_file_var.get()
     key = key_var.get()
+
+    if not is_valid_input_file(input_file):
+        print("Invalid input file path")
+        input_file_var.set(f"Error: Input file does not exist: {input_file}")
+        return "Invalid input file path"
 
     with open(input_file, 'r', encoding='utf-8') as f:
         plaintext = f.read()
@@ -48,6 +59,11 @@ def save_decrypted(input_file_var, key_var, output_file_decrypted_var, preview_t
 
     print("Input File:", input_file)
     print("Decryption Key:", key)
+
+    if not is_valid_input_file(input_file):
+        print("Invalid input file path")
+        input_file_var.set(f"Error: Input file does not exist: {input_file}")
+        return "Invalid input file path"
 
     with open(input_file, 'r', encoding='utf-8') as f:
         ciphertext = f.read()

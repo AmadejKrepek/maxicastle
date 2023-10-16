@@ -1,6 +1,6 @@
 # Hill cipher encryption function for Slovenian alphabet
-from modules.crypto.utils.utils import preprocess_message, pad_message
-from modules.crypto.constants import alphabet
+from modules.exercise_1.crypto.utils.utils import preprocess_message, pad_message
+from modules.exercise_1.crypto.constants import alphabet
 
 
 # Hill cipher encryption function for Slovenian alphabet

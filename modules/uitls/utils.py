@@ -1,8 +1,9 @@
 from tkinter import filedialog
 import os
 import tkinter as tk
-from modules.crypto.decrypt import decrypt
-from modules.crypto.encrypt import encrypt
+from modules.exercise_1.crypto.decrypt import decrypt
+from modules.exercise_1.crypto.encrypt import encrypt
+
 
 def open_file(file_var):
     file_path = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt")])

@@ -1,5 +1,5 @@
-from modules.crypto.utils.utils import preprocess_message, pad_message
-from modules.crypto.constants import alphabet
+from modules.exercise_1.crypto.utils.utils import preprocess_message, pad_message
+from modules.exercise_1.crypto.constants import alphabet
 
 
 def calculate_determinant(matrix):

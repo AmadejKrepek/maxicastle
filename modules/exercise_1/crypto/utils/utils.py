@@ -1,4 +1,4 @@
-from modules.crypto.constants import alphabet
+from modules.exercise_1.crypto.constants import alphabet
 
 
 # Function to convert a message to uppercase and remove characters not in the alphabet

@@ -1,5 +1,5 @@
+# Hill cipher encryption function for Slovenian alphabet
 from modules.crypto.utils.utils import preprocess_message, pad_message
-
 from modules.crypto.constants import alphabet
 
 
@@ -8,7 +8,12 @@ def encrypt(plaintext, key):
     plaintext = preprocess_message(plaintext)
     key = preprocess_message(key)
     n = int(len(key) ** 0.5)
-    plaintext = pad_message(plaintext, n)
+
+    # Check if the length of the plaintext is a multiple of 'n'
+    if len(plaintext) % n != 0:
+        # If not, pad the plaintext to make it a whole number of blocks
+        plaintext = pad_message(plaintext, n)
+
     while len(key) < n * n:
         key += "a"
 

@@ -12,7 +12,7 @@ def open_file(file_var):
 
 
 def update_preview(file_var, text_widget):
-    file_path = file_var.get()
+    file_path = file_var
     if file_path:
         try:
             with open(file_path, "r", encoding="utf-8") as file:
@@ -40,7 +40,7 @@ def save_encrypted(input_file_var, key_var, output_file_encrypted_var, preview_t
     with open(output_file_encrypted, 'w', encoding='utf-8') as f:
         f.write(encrypted_text)
 
-    update_preview(output_file_encrypted_var, preview_text_box_encrypted)
+    update_preview(output_file_encrypted, preview_text_box_encrypted)
 
 
 def save_decrypted(input_file_var, key_var, output_file_decrypted_var, preview_text_box_decrypted):
@@ -62,4 +62,4 @@ def save_decrypted(input_file_var, key_var, output_file_decrypted_var, preview_t
     with open(output_file_decrypted, 'w', encoding='utf-8') as f:
         f.write(decrypted_text)
 
-    update_preview(output_file_decrypted_var, preview_text_box_decrypted)
+    update_preview(output_file_decrypted, preview_text_box_decrypted)

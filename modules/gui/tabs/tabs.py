@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from modules.exercise_1.tab.tab_1 import create_tab1_controls
+from modules.exercise_2.tab.tab_2 import create_tab2_controls
 from modules.uitls.utils import open_file, save_encrypted, save_decrypted
 
 
@@ -26,6 +27,7 @@ def create_tabs(root):
 
     # Labels for the tabs
     ttk.Label(tab1, text="Exercise 1", font=("Helvetica", 16, "bold")).grid(column=0, row=0, padx=60, pady=30, columnspan=2)
-    ttk.Label(tab2, text="Exercise 2").grid(column=0, row=0, padx=60, pady=30)
+    ttk.Label(tab2, text="Exercise 2", font=("Helvetica", 16, "bold")).grid(column=0, row=0, padx=60, pady=30, columnspan=2)
 
     create_tab1_controls(tab1)
+    create_tab2_controls(tab2)

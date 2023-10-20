@@ -1,0 +1,1 @@
+SLOVENIAN_ALPHABET = "abcčdefghijklmnoprsštuvzž"

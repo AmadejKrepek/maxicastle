@@ -51,7 +51,7 @@ def save_encrypted(input_file_var, key_var, output_file_encrypted_var, preview_t
         with open(output_file_encrypted, 'wb') as f:
             f.write(bytes(encrypted_data))
 
-    update_preview(encrypted_data, preview_text_box_encrypted)
+    #update_preview(encrypted_data, preview_text_box_encrypted)
 
 
 def save_decrypted(input_file_var, key_var, output_file_decrypted_var, preview_text_box_decrypted, iv_file_var):
@@ -96,4 +96,4 @@ def save_decrypted(input_file_var, key_var, output_file_decrypted_var, preview_t
     with open(output_file_decrypted, 'wb') as f:
         f.write(bytes(decrypted_text))
 
-    update_preview(decrypted_text, preview_text_box_decrypted)
+    #update_preview(decrypted_text, preview_text_box_decrypted)

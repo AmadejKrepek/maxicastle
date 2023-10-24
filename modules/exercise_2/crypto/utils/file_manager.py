@@ -10,10 +10,20 @@ def generateIV():
     return iv
 
 
-def save_encrypted(input_file_var, key_var, output_file_encrypted_var, preview_text_box_encrypted):
+def save_encrypted(input_file_var, key_var, output_file_encrypted_var, preview_text_box_encrypted, iv_file_var):
     input_file = input_file_var.get()
     key = key_var.get()
+    iv_path = iv_file_var.get()
     key_bytes = None
+
+    iv_bytes = None
+
+    try:
+        with open(iv_path, 'rb') as key_file:
+            iv_bytes = key_file.read()
+    except FileNotFoundError:
+        print(f"IV file not found at {key}")
+
     try:
         with open(key, 'rb') as key_file:
             key_bytes = key_file.read()
@@ -31,9 +41,7 @@ def save_encrypted(input_file_var, key_var, output_file_encrypted_var, preview_t
         input_file_var.set(f"Error: Input file does not exist: {input_file}")
         return "Invalid input file path"
 
-    # Generate a 256-bit IV (32 bytes)
-    iv = generateIV()
-    valid, encrypted_data = chacha20_encrypt_file(input_file, output_file_encrypted_var, key_bytes, iv)
+    valid, encrypted_data = chacha20_encrypt_file(input_file, output_file_encrypted_var, key_bytes, iv_bytes)
 
     # Automatically choose a name for the output file
     input_file_name = os.path.basename(input_file)
@@ -46,9 +54,30 @@ def save_encrypted(input_file_var, key_var, output_file_encrypted_var, preview_t
     update_preview(encrypted_data, preview_text_box_encrypted)
 
 
-def save_decrypted(input_file_var, key_var, output_file_decrypted_var, preview_text_box_decrypted):
+def save_decrypted(input_file_var, key_var, output_file_decrypted_var, preview_text_box_decrypted, iv_file_var):
     input_file = input_file_var.get()
+    iv_path = iv_file_var.get()
     key = key_var.get()
+    key_bytes = None
+    iv_bytes = None
+
+    try:
+        with open(iv_path, 'rb') as key_file:
+            iv_bytes = key_file.read()
+    except FileNotFoundError:
+        print(f"IV file not found at {key}")
+
+    try:
+        with open(key, 'rb') as key_file:
+            key_bytes = key_file.read()
+    except FileNotFoundError:
+        print(f"Key file not found at {key}")
+    else:
+        # Wrap the key with b''
+        key_bytes = b'' + key_bytes
+
+        # Now key_bytes contains the key as bytes
+        print("Wrapped Key:", key_bytes)
 
     print("Input File:", input_file)
     print("Decryption Key:", key)
@@ -58,16 +87,13 @@ def save_decrypted(input_file_var, key_var, output_file_decrypted_var, preview_t
         input_file_var.set(f"Error: Input file does not exist: {input_file}")
         return "Invalid input file path"
 
-    with open(input_file, 'r', encoding='utf-8') as f:
-        ciphertext = f.read()
-
-    decrypted_text = decrypt(ciphertext, key)
+    valid, decrypted_text = chacha20_encrypt_file(input_file, output_file_decrypted_var, key_bytes, iv_bytes)
 
     # Automatically choose a name for the output file
     input_file_name = os.path.basename(input_file)
-    output_file_decrypted = os.path.splitext(input_file_name)[0] + "_decrypted.txt"
+    output_file_decrypted = os.path.splitext(input_file_name)[0] + "_decrypted.zip"
 
-    with open(output_file_decrypted, 'w', encoding='utf-8') as f:
-        f.write(decrypted_text)
+    with open(output_file_decrypted, 'wb') as f:
+        f.write(bytes(decrypted_text))
 
     update_preview(decrypted_text, preview_text_box_decrypted)

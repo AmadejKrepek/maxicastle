@@ -1,3 +1,4 @@
+import os
 from tkinter import ttk
 import tkinter as tk
 
@@ -24,6 +25,33 @@ def create_tab2_controls(tab1):
     # Create a sub-frame for key controls
     key_frame = ttk.LabelFrame(tab1, text="Key")
     key_frame.grid(column=0, row=0, padx=60, pady=10, columnspan=2, sticky="w")
+
+    # Create variables to hold the IV file path
+    iv_file_var = tk.StringVar()
+
+    # Create a function to generate an IV and save it to a file
+    def generate_and_save_iv():
+        iv = os.urandom(8)  # Generate an 8-byte IV (64 bits)
+        iv_file_path = "iv.txt"  # Specify the path where you want to save the IV
+        with open(iv_file_path, 'wb') as iv_file:
+            iv_file.write(iv)
+        # Update the iv_file_var to hold the IV file path
+        iv_file_var.set(iv_file_path)
+
+    # Create a function to upload an IV from a file
+    def upload_iv():
+        iv_file_path = open_file(iv_file_var)
+        if iv_file_path:
+            # Update the iv_file_var to hold the IV file path
+            iv_file_var.set(iv_file_path)
+
+    # IV controls
+    ttk.Button(key_frame, text="Generate IV and Save to File", command=generate_and_save_iv).grid(
+        column=6, row=0, padx=10, pady=5, columnspan=3, sticky="w")
+    ttk.Button(key_frame, text="Upload IV", command=upload_iv).grid(
+        column=9, row=0, padx=10, pady=5, columnspan=3, sticky="e")
+    ttk.Label(key_frame, text="IV file path").grid(column=6, row=1, padx=5, pady=5, sticky="w")
+    ttk.Entry(key_frame, textvariable=iv_file_var, width=40).grid(column=7, row=1, padx=10, pady=5, columnspan=5)
 
     # Create a function to generate a key and save it to a file as bytes
     def generate_and_save_key():
@@ -91,13 +119,14 @@ def create_tab2_controls(tab1):
         for text_box in text_boxes:
             text_box.yview(*args)
 
-    # Define button with lambda function to pass arguments
+        # Define button with lambda function to pass arguments
+
     ttk.Button(tab1, text="Encrypt File",
                command=lambda: save_encrypted(input_file_var, key_var, output_file_encrypted_var,
-                                              preview_text_box_encrypted)
+                                              preview_text_box_encrypted, iv_file_var)
                ).grid(column=0, row=4, padx=10, pady=5)
 
     ttk.Button(tab1, text="Decrypt File",
                command=lambda: save_decrypted(input_file_var, key_var, output_file_decrypted_var,
-                                              preview_text_box_decrypted)
+                                              preview_text_box_decrypted, iv_file_var)
                ).grid(column=1, row=4, padx=10, pady=5)

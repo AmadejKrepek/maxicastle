@@ -1,56 +1,49 @@
-from tkinter import filedialog
 import os
-import tkinter as tk
-from modules.exercise_1.crypto.decrypt import decrypt
-from modules.exercise_1.crypto.encrypt import encrypt
+
+from modules.exercise_2.crypto.encrypt import chacha20_encrypt_file
+from modules.uitls.utils import is_valid_input_file, update_preview
 
 
-def open_file(file_var):
-    file_path = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt"), ("Zip Files", "*.zip")])
-    if file_path:
-        file_var.set(file_path)
-
-
-def update_preview(encrypted_text, text_widget):
-    if encrypted_text:
-        try:
-            if text_widget.get("1.0", "end-1c"):
-                text_widget.delete("1.0", tk.END)
-            text_widget.insert(tk.END, encrypted_text)
-        except Exception as e:
-            text_widget.delete(1.0, tk.END)
-            text_widget.insert(tk.END, f"Error reading: {str(e)}")
-
-
-def is_valid_input_file(input_file):
-    if not os.path.exists(input_file):
-        return False
-    return True
+def generateIV():
+    # Generate a 256-bit IV (32 bytes)
+    iv = os.urandom(32)
+    return iv
 
 
 def save_encrypted(input_file_var, key_var, output_file_encrypted_var, preview_text_box_encrypted):
     input_file = input_file_var.get()
     key = key_var.get()
+    key_bytes = None
+    try:
+        with open(key, 'rb') as key_file:
+            key_bytes = key_file.read()
+    except FileNotFoundError:
+        print(f"Key file not found at {key}")
+    else:
+        # Wrap the key with b''
+        key_bytes = b'' + key_bytes
+
+        # Now key_bytes contains the key as bytes
+        print("Wrapped Key:", key_bytes)
 
     if not is_valid_input_file(input_file):
         print("Invalid input file path")
         input_file_var.set(f"Error: Input file does not exist: {input_file}")
         return "Invalid input file path"
 
-    with open(input_file, 'r', encoding='utf-8') as f:
-        plaintext = f.read()
-
-    valid, encrypted_text = encrypt(plaintext, key)
+    # Generate a 256-bit IV (32 bytes)
+    iv = generateIV()
+    valid, encrypted_data = chacha20_encrypt_file(input_file, output_file_encrypted_var, key_bytes, iv)
 
     # Automatically choose a name for the output file
     input_file_name = os.path.basename(input_file)
-    output_file_encrypted = os.path.splitext(input_file_name)[0] + "_encrypted.txt"
+    output_file_encrypted = os.path.splitext(input_file_name)[0] + "_encrypted.zip"
 
     if valid:
-        with open(output_file_encrypted, 'w', encoding='utf-8') as f:
-            f.write(encrypted_text)
+        with open(output_file_encrypted, 'wb') as f:
+            f.write(bytes(encrypted_data))
 
-    update_preview(encrypted_text, preview_text_box_encrypted)
+    update_preview(encrypted_data, preview_text_box_encrypted)
 
 
 def save_decrypted(input_file_var, key_var, output_file_decrypted_var, preview_text_box_decrypted):

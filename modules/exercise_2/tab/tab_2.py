@@ -1,8 +1,9 @@
 from tkinter import ttk
 import tkinter as tk
 
+from modules.exercise_2.crypto.utils.file_manager import save_encrypted, save_decrypted
 from modules.exercise_2.crypto.utils.utils import generate_key
-from modules.uitls.utils import open_file, save_encrypted, save_decrypted
+from modules.uitls.utils import open_file
 
 
 def create_tab2_controls(tab1):
@@ -24,10 +25,24 @@ def create_tab2_controls(tab1):
     key_frame = ttk.LabelFrame(tab1, text="Key")
     key_frame.grid(column=0, row=0, padx=60, pady=10, columnspan=2, sticky="w")
 
+    # Create a function to generate a key and save it to a file as bytes
+    def generate_and_save_key():
+        key = generate_key()  # Call your generate_key function to get the key
+        key_file_path = "key.txt"  # Specify the path where you want to save the key
+        with open(key_file_path, 'wb') as key_file:
+            key_file.write(key)
+
+    # Create a function to upload a key from a file
+    def upload_key():
+        key_file_path = open_file(key_var)
+        if key_file_path:
+            # Update the input_file_var to hold the key file path
+            input_file_var.set(key_file_path)
+
     # Key controls
-    ttk.Button(key_frame, text="Add Key", command=lambda: open_file(input_file_var)).grid(
+    ttk.Button(key_frame, text="Generate Key and Save to File", command=generate_and_save_key).grid(
         column=0, row=0, padx=10, pady=5, columnspan=3, sticky="w")
-    ttk.Button(key_frame, text="Generate Key", command=lambda: generate_key(key_var)).grid(
+    ttk.Button(key_frame, text="Upload Key", command=upload_key).grid(
         column=3, row=0, padx=10, pady=5, columnspan=3, sticky="e")
     ttk.Label(key_frame, text="Key file path").grid(column=0, row=1, padx=5, pady=5, sticky="w")
     ttk.Entry(key_frame, textvariable=input_file_var, width=40).grid(column=1, row=1, padx=10, pady=5, columnspan=5)
@@ -49,7 +64,6 @@ def create_tab2_controls(tab1):
                                                                             columnspan=2)
     ttk.Label(decryption_frame, text="Decryption Key").grid(column=0, row=2, padx=10, pady=5, sticky="w")
     ttk.Entry(decryption_frame, textvariable=key_var, width=20).grid(column=1, row=2, padx=10, pady=5)
-
     # Create text boxes for file previews with a single vertical scrollbar
     ttk.Label(tab1, text="Preview of Encrypted File").grid(column=0, row=2, padx=60, pady=10)
     preview_text_box_encrypted = tk.Text(tab1, wrap=tk.WORD, height=15, width=50)

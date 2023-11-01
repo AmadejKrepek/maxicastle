@@ -1,6 +1,7 @@
 def generate_key():
     return b'SomeSecretKey12345678901234'
 
+
 def rotate_left(val, n):
     return ((val << n) & 0xFFFFFFFF) | (val >> (32 - n) & 0xFFFFFFFF)
 

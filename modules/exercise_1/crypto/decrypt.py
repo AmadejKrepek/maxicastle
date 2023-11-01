@@ -18,8 +18,10 @@ def calculate_determinant(matrix):
 
 def calculate_inverse_matrix(matrix, det):
     n = len(matrix)
+    # 2D matrika - vsak element je 0
     adjugate_matrix = [[0] * n for _ in range(n)]
 
+    # Vsak element je kofaktor elementa originalne matrike
     for i in range(n):
         for j in range(n):
             sub_matrix = [row[:j] + row[j + 1:] for row in matrix[:i] + matrix[i + 1:]]
@@ -27,7 +29,8 @@ def calculate_inverse_matrix(matrix, det):
             cofactor = (-1) ** (i + j) * sub_matrix_det
             adjugate_matrix[j][i] = cofactor
 
-    n_mod = len(alphabet.SLOVENIAN_ALPHABET)  # Modulus based on the size of the alphabet
+    n_mod = len(alphabet.SLOVENIAN_ALPHABET)  # Modulus based on the size of the alphabet#
+    # Transponiraš matriko kofektorjev
     inverse_matrix = [[(adjugate_matrix[i][j] * pow(det, -1, n_mod)) % n_mod for j in range(n)] for i in range(n)]
 
     return inverse_matrix

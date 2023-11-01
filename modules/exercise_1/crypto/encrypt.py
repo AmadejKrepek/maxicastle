@@ -26,6 +26,7 @@ def encrypt(plaintext, key, modulus=25):
             return False
 
         det = determinant(matrix)
+        # Singular matrix
         if det == 0:
             return False
 
@@ -35,6 +36,8 @@ def encrypt(plaintext, key, modulus=25):
 
         return False
 
+    # Greatest common divisor
+    # Euclidean algorythm, till b is 0
     def gcd(a, b):
         while b:
             a, b = b, a % b

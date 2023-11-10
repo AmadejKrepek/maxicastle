@@ -31,7 +31,7 @@ def create_tab3_controls(tab1):
 
     # Create a function to generate an IV and save it to a file
     def generate_and_save_iv():
-        iv = os.urandom(8)  # Generate an 8-byte IV (64 bits)
+        iv = os.urandom(16)  # Generate an 8-byte IV (64 bits)
         iv_file_path = "iv.txt"  # Specify the path where you want to save the IV
         with open(iv_file_path, 'wb') as iv_file:
             iv_file.write(iv)

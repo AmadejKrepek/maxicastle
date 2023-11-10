@@ -5,7 +5,7 @@ from modules.exercise_3.crypto.decrypt import aes_decrypt_file
 from modules.uitls.utils import is_valid_input_file, update_preview
 
 
-def save_encrypted(input_file_var, key_var, output_file_encrypted_var, iv_file_var):
+def save_encrypted(input_file_var, key_var, iv_file_var, CURRENT_MODE):
     input_file = input_file_var.get()
     key = key_var.get()
     iv_path = iv_file_var.get()
@@ -33,7 +33,7 @@ def save_encrypted(input_file_var, key_var, output_file_encrypted_var, iv_file_v
         input_file_var.set(f"Error: Input file does not exist: {input_file}")
         return "Invalid input file path"
 
-    valid, encrypted_data = aes_encrypt_file(input_file, output_file_encrypted_var, key_bytes, iv_bytes)
+    valid, encrypted_data = aes_encrypt_file(input_file, key_bytes, iv_bytes, CURRENT_MODE)
     # Automatically choose a name for the output file
     input_file_name = os.path.basename(input_file)
     output_file_encrypted = os.path.splitext(input_file_name)[0] + "_encrypted.zip"
@@ -45,7 +45,7 @@ def save_encrypted(input_file_var, key_var, output_file_encrypted_var, iv_file_v
     # update_preview(encrypted_data, preview_text_box_encrypted)
 
 
-def save_decrypted(input_file_var, key_var, output_file_decrypted_var, iv_file_var):
+def save_decrypted(input_file_var, key_var, iv_file_var, CURRENT_MODE):
     input_file = input_file_var.get()
     iv_path = iv_file_var.get()
     key = key_var.get()
@@ -78,7 +78,7 @@ def save_decrypted(input_file_var, key_var, output_file_decrypted_var, iv_file_v
         input_file_var.set(f"Error: Input file does not exist: {input_file}")
         return "Invalid input file path"
 
-    valid, decrypted_text = aes_decrypt_file(input_file, output_file_decrypted_var, key_bytes, iv_bytes)
+    valid, decrypted_text = aes_decrypt_file(input_file, key_bytes, iv_bytes, CURRENT_MODE)
 
     # Automatically choose a name for the output file
     input_file_name = os.path.basename(input_file)

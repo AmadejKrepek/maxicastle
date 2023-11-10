@@ -2,6 +2,7 @@ import os
 from tkinter import ttk
 import tkinter as tk
 
+from modules.exercise_3.crypto.modes.modes import MODE_ECB, MODE_CBC, MODE_CCM, MODE_CTR
 from modules.exercise_3.crypto.utils.file_manager import save_encrypted, save_decrypted
 from modules.exercise_3.crypto.utils.utils import generate_key
 from modules.uitls.utils import open_file
@@ -44,6 +45,33 @@ def create_tab3_controls(tab1):
         if iv_file_path:
             # Update the iv_file_var to hold the IV file path
             iv_file_var.set(iv_file_path)
+
+    # Add a function to get the selected encryption modes
+    def get_selected_modes(ecb_var, cbc_var, ccm_var, ctr_var):
+        if ecb_var.get():
+            return MODE_ECB
+        if cbc_var.get():
+            return MODE_CBC
+        if ccm_var.get():
+            return MODE_CCM
+        if ctr_var.get():
+            return MODE_CTR
+
+    # Create a sub-frame for mode controls
+    mode_frame = ttk.LabelFrame(tab1, text="Mode")
+    mode_frame.grid(column=2, row=0, padx=60, pady=10, columnspan=2, sticky="w")
+
+    # Create variables to hold the state of checkboxes for different modes
+    ecb_var = tk.BooleanVar(value=True)
+    cbc_var = tk.BooleanVar()
+    ccm_var = tk.BooleanVar()
+    ctr_var = tk.BooleanVar()
+
+    # Mode controls
+    ttk.Checkbutton(mode_frame, text="ECB", variable=ecb_var).grid(column=0, row=0, padx=5, pady=5, sticky="w")
+    ttk.Checkbutton(mode_frame, text="CBC", variable=cbc_var).grid(column=1, row=0, padx=5, pady=5, sticky="w")
+    ttk.Checkbutton(mode_frame, text="CCM", variable=ccm_var).grid(column=2, row=0, padx=5, pady=5, sticky="w")
+    ttk.Checkbutton(mode_frame, text="CTR", variable=ctr_var).grid(column=3, row=0, padx=5, pady=5, sticky="w")
 
     # IV controls
     ttk.Button(key_frame, text="Generate IV and Save to File", command=generate_and_save_iv).grid(
@@ -94,11 +122,11 @@ def create_tab3_controls(tab1):
     ttk.Entry(decryption_frame, textvariable=key_var, width=20).grid(column=1, row=2, padx=10, pady=5)
 
     ttk.Button(tab1, text="Encrypt File",
-               command=lambda: save_encrypted(input_file_var, key_var, output_file_encrypted_var,
-                                              iv_file_var)
+               command=lambda: save_encrypted(input_file_var, key_var,
+                                              iv_file_var, get_selected_modes(ecb_var, cbc_var, ccm_var, ctr_var))
                ).grid(column=0, row=4, padx=10, pady=5)
 
     ttk.Button(tab1, text="Decrypt File",
-               command=lambda: save_decrypted(input_file_var, key_var, output_file_decrypted_var,
-                                              iv_file_var)
+               command=lambda: save_decrypted(input_file_var, key_var,
+                                              iv_file_var, get_selected_modes(ecb_var, cbc_var, ccm_var, ctr_var))
                ).grid(column=1, row=4, padx=10, pady=5)

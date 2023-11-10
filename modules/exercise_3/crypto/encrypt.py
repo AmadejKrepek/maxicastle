@@ -8,11 +8,9 @@ from modules.exercise_3.crypto.utils.utils import generate_nonce
 from modules.exercise_3.crypto.modes.modes import MODE_CCM, MODE_ECB, MODE_CBC, MODE_CTR
 
 
-def aes_encrypt_file(input_file, output_file, key, iv, position=0):
+def aes_encrypt_file(input_file, key, iv, CURRENT_MODE):
     with open(input_file, 'rb') as f:
         data = f.read()
-
-    CURRENT_MODE = 0
 
     encrypted_data = []
 

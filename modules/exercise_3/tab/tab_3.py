@@ -31,13 +31,21 @@ def create_tab3_controls(tab1):
     iv_file_var = tk.StringVar()
 
     # Create a function to generate an IV and save it to a file
+    # Create a function to generate an IV or nonce and save it to a file
     def generate_and_save_iv():
-        iv = os.urandom(16)  # Generate an 8-byte IV (64 bits)
-        iv_file_path = "iv.txt"  # Specify the path where you want to save the IV
+        selected_mode = get_selected_modes(ecb_var, cbc_var, ccm_var, ctr_var)
+        if selected_mode in [MODE_CBC, MODE_CCM]:
+            iv_or_nonce = os.urandom(16)  # Generate a 16-byte nonce (128 bits)
+            iv_file_path = "nonce.txt"  # Specify the path where you want to save the nonce
+        else:
+            iv_or_nonce = os.urandom(16)  # Generate a 16-byte IV (128 bits)
+            iv_file_path = "iv.txt"  # Specify the path where you want to save the IV
+
         with open(iv_file_path, 'wb') as iv_file:
-            iv_file.write(iv)
-        # Update the iv_file_var to hold the IV file path
-        iv_file_var.set(iv_file_path)
+            iv_file.write(iv_or_nonce)
+
+        # Update the iv_variable to hold the IV or nonce file path
+        iv_variable.set(iv_file_path)
 
     # Create a function to upload an IV from a file
     def upload_iv():
@@ -67,19 +75,34 @@ def create_tab3_controls(tab1):
     ccm_var = tk.BooleanVar()
     ctr_var = tk.BooleanVar()
 
+    iv_variable = tk.StringVar()
+
+    def update_iv_label(*args):
+        selected_mode = get_selected_modes(ecb_var, cbc_var, ccm_var, ctr_var)
+        if selected_mode in [MODE_CBC, MODE_CCM]:
+            iv_label_text = "Nonce file path"
+        else:
+            iv_label_text = "IV file path"
+        iv_label.config(text=iv_label_text)
+
+    # Add trace to the cbc_var and ccm_var to update IV label on the fly
+    cbc_var.trace_add("write", update_iv_label)
+    ccm_var.trace_add("write", update_iv_label)
+
     # Mode controls
     ttk.Checkbutton(mode_frame, text="ECB", variable=ecb_var).grid(column=0, row=0, padx=5, pady=5, sticky="w")
     ttk.Checkbutton(mode_frame, text="CBC", variable=cbc_var).grid(column=1, row=0, padx=5, pady=5, sticky="w")
     ttk.Checkbutton(mode_frame, text="CCM", variable=ccm_var).grid(column=2, row=0, padx=5, pady=5, sticky="w")
     ttk.Checkbutton(mode_frame, text="CTR", variable=ctr_var).grid(column=3, row=0, padx=5, pady=5, sticky="w")
 
-    # IV controls
-    ttk.Button(key_frame, text="Generate IV and Save to File", command=generate_and_save_iv).grid(
+    ttk.Button(key_frame, text="Generate", command=generate_and_save_iv).grid(
         column=6, row=0, padx=10, pady=5, columnspan=3, sticky="w")
-    ttk.Button(key_frame, text="Upload IV", command=upload_iv).grid(
+    ttk.Button(key_frame, text="Upload", command=upload_iv).grid(
         column=9, row=0, padx=10, pady=5, columnspan=3, sticky="e")
-    ttk.Label(key_frame, text="IV file path").grid(column=6, row=1, padx=5, pady=5, sticky="w")
-    ttk.Entry(key_frame, textvariable=iv_file_var, width=40).grid(column=7, row=1, padx=10, pady=5, columnspan=5)
+    # Define iv_label here
+    iv_label = ttk.Label(key_frame, text="IV file path")
+    iv_label.grid(column=6, row=1, padx=5, pady=5, sticky="w")
+    ttk.Entry(key_frame, textvariable=iv_variable, width=40).grid(column=7, row=1, padx=10, pady=5, columnspan=5)
 
     # Create a function to generate a key and save it to a file as bytes
     def generate_and_save_key():

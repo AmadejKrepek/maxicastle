@@ -1,5 +1,3 @@
-import pyaes
-
 from modules.exercise_3.crypto.modes.cbc.decrypt import aes_cbc_decrypt
 from modules.exercise_3.crypto.modes.cbc.encrypt import aes_cbc_encrypt
 from modules.exercise_3.crypto.modes.counter.decrypt import aes_ctr_decrypt

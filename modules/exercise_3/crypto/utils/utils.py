@@ -23,7 +23,7 @@ def split_blocks(data, block_size):
     return [data[i:i+block_size] for i in range(0, len(data), block_size)]
 
 
-def generate_nonce(size=12):
+def generate_nonce(size: object = 12) -> object:
     """
     Generate a random nonce for cryptographic use.
 

@@ -5,7 +5,7 @@ from modules.exercise_3.crypto.decrypt import aes_decrypt_file
 from modules.uitls.utils import is_valid_input_file, update_preview
 
 
-def save_encrypted(input_file_var, key_var, output_file_encrypted_var, preview_text_box_encrypted, iv_file_var):
+def save_encrypted(input_file_var, key_var, output_file_encrypted_var, iv_file_var):
     input_file = input_file_var.get()
     key = key_var.get()
     iv_path = iv_file_var.get()
@@ -45,7 +45,7 @@ def save_encrypted(input_file_var, key_var, output_file_encrypted_var, preview_t
     # update_preview(encrypted_data, preview_text_box_encrypted)
 
 
-def save_decrypted(input_file_var, key_var, output_file_decrypted_var, preview_text_box_decrypted, iv_file_var):
+def save_decrypted(input_file_var, key_var, output_file_decrypted_var, iv_file_var):
     input_file = input_file_var.get()
     iv_path = iv_file_var.get()
     key = key_var.get()

@@ -18,6 +18,18 @@ def pad(m):
     padding = bytes([pad_length] * pad_length)
     return m + padding
 
+def pad_data(data, block_size):
+    padding_size = block_size - (len(data) % block_size)
+    if padding_size == 0:
+        padding_size = block_size
+    padded_data = data + bytes([padding_size] * padding_size)
+    return padded_data
+
+
+def unpad_data(data):
+    padding_size = data[-1]
+    return data[:-padding_size]
+
 def unpad(padded_message):
     # Extract the last byte to determine the length of the padding
     pad_length = padded_message[-1]

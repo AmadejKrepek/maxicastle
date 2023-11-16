@@ -34,8 +34,8 @@ def create_tab3_controls(tab1):
     # Create a function to generate an IV or nonce and save it to a file
     def generate_and_save_iv():
         selected_mode = get_selected_modes(ecb_var, cbc_var, ccm_var, ctr_var)
-        if selected_mode in [MODE_CBC, MODE_CCM]:
-            iv_or_nonce = os.urandom(16)  # Generate a 16-byte nonce (128 bits)
+        if selected_mode in [MODE_CCM, MODE_CTR]:
+            iv_or_nonce = os.urandom(8)  # Generate a 16-byte nonce (128 bits)
             iv_file_path = "nonce.txt"  # Specify the path where you want to save the nonce
         else:
             iv_or_nonce = os.urandom(16)  # Generate a 16-byte IV (128 bits)
@@ -79,7 +79,7 @@ def create_tab3_controls(tab1):
 
     def update_iv_label(*args):
         selected_mode = get_selected_modes(ecb_var, cbc_var, ccm_var, ctr_var)
-        if selected_mode in [MODE_CBC, MODE_CCM]:
+        if selected_mode in [MODE_CTR, MODE_CCM]:
             iv_label_text = "Nonce file path"
         else:
             iv_label_text = "IV file path"
@@ -88,6 +88,8 @@ def create_tab3_controls(tab1):
     # Add trace to the cbc_var and ccm_var to update IV label on the fly
     cbc_var.trace_add("write", update_iv_label)
     ccm_var.trace_add("write", update_iv_label)
+    ctr_var.trace_add("write", update_iv_label)
+    ecb_var.trace_add("write", update_iv_label)
 
     # Mode controls
     ttk.Checkbutton(mode_frame, text="ECB", variable=ecb_var).grid(column=0, row=0, padx=5, pady=5, sticky="w")

@@ -1,4 +1,5 @@
 import pyaes
+from tqdm import tqdm
 
 from modules.exercise_3.crypto.utils.utils import unpad, unpad_data
 
@@ -11,11 +12,13 @@ def aes_cbc_decrypt(ciphertext, key, iv):
 
     plaintext = b''
     previous_block = iv
-    for block in blocks:
-        decrypted_block = aes.decrypt(block)
-        xored_block = bytes(x ^ y for x, y in zip(decrypted_block, previous_block))
-        plaintext += bytes(xored_block)
-        previous_block = block
+    with tqdm(total=len(blocks), desc='Decrypting', unit='blocks') as pbar:
+        for block in blocks:
+            decrypted_block = aes.decrypt(block)
+            xored_block = bytes(x ^ y for x, y in zip(decrypted_block, previous_block))
+            plaintext += bytes(xored_block)
+            previous_block = block
+            pbar.update(1)
 
     unpadded_plaintext = unpad_data(plaintext)
 

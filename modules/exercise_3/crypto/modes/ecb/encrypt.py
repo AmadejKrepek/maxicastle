@@ -1,3 +1,5 @@
+
+from tqdm import tqdm
 import pyaes
 
 from modules.exercise_3.crypto.utils.utils import pad_data
@@ -12,8 +14,10 @@ def aes_ecb_encrypt(data, key):
 
     # Electronic Codebook
     ciphertext = b''
-    for block in blocks:
-        encrypted_block = aes.encrypt(block)
-        ciphertext += bytes(encrypted_block)
+    with tqdm(total=len(blocks), desc='Encrypting', unit='blocks') as pbar:
+        for block in blocks:
+            encrypted_block = aes.encrypt(block)
+            ciphertext += bytes(encrypted_block)
+            pbar.update(1)
 
     return ciphertext

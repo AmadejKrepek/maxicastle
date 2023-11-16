@@ -1,4 +1,5 @@
 import pyaes
+from tqdm import tqdm
 
 
 def aes_ccm_encrypt(data, key, nonce):
@@ -17,14 +18,21 @@ def aes_ccm_encrypt(data, key, nonce):
     counter_64_bit = counter_bytes + b'\x00\x00\x00\x00'
     counter_block = nonce + counter_64_bit
 
-    # Encrypt each block separately
-    encrypted_blocks = [aes.encrypt(counter_block) for _ in range(q)]
+    # Initialize tqdm for combined progress
+    tqdm_combined = tqdm(total=q * 2, desc="Encrypting and XORing", unit="block")
 
-    # XOR each encrypted block with the corresponding plaintext block
-    ciphertext_blocks = [bytes(x ^ y for x, y in zip(e_block, block)) for e_block, block in
-                         zip(encrypted_blocks, blocks)]
+    # Encrypt each block separately and XOR with the corresponding plaintext block
+    encrypted_blocks = []
+    for _ in range(q):
+        encrypted_block = aes.encrypt(counter_block)
+        ciphertext_block = bytes(x ^ y for x, y in zip(encrypted_block, blocks[_]))
+        encrypted_blocks.append(ciphertext_block)
+        tqdm_combined.update(2)  # Update progress for both encryption and XOR
+
+    # Close tqdm for combined progress
+    tqdm_combined.close()
 
     # Combine encrypted blocks to get the ciphertext
-    ciphertext = b''.join(ciphertext_blocks)
+    ciphertext = b''.join(encrypted_blocks)
 
     return ciphertext

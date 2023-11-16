@@ -1,4 +1,5 @@
 import pyaes
+from tqdm import tqdm
 
 
 def aes_ccm_decrypt(ciphertext, key, nonce):
@@ -21,7 +22,12 @@ def aes_ccm_decrypt(ciphertext, key, nonce):
     counter_block = nonce + counter_64_bit
 
     # Decrypt each block separately
-    decrypted_blocks = [bytes(x ^ y for x, y in zip(aes.encrypt(counter_block), block)) for block in blocks]
+    decrypted_blocks = []
+    with tqdm(total=len(blocks), desc='Decrypting', unit='blocks') as pbar:
+        for block in blocks:
+            decrypted_block = bytes(x ^ y for x, y in zip(aes.encrypt(counter_block), block))
+            decrypted_blocks.append(decrypted_block)
+            pbar.update(1)  # Update the progress bar
 
     # Combine decrypted blocks to get the plaintext
     plaintext = b''.join(decrypted_blocks)

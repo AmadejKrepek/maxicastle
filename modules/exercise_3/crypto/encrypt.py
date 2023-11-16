@@ -3,8 +3,6 @@ from modules.exercise_3.crypto.modes.counter.encrypt import aes_ctr_encrypt
 from modules.exercise_3.crypto.modes.ccm.encrypt import aes_ccm_encrypt
 from modules.exercise_3.crypto.modes.ecb.encrypt import aes_ecb_encrypt
 
-from modules.exercise_3.crypto.utils.utils import generate_nonce
-
 from modules.exercise_3.crypto.modes.modes import MODE_CCM, MODE_ECB, MODE_CBC, MODE_CTR
 
 

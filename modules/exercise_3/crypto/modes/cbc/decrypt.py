@@ -1,6 +1,6 @@
 import pyaes
 
-from modules.exercise_3.crypto.utils.utils import unpad
+from modules.exercise_3.crypto.utils.utils import unpad, unpad_data
 
 
 def aes_cbc_decrypt(ciphertext, key, iv):
@@ -17,6 +17,6 @@ def aes_cbc_decrypt(ciphertext, key, iv):
         plaintext += bytes(xored_block)
         previous_block = block
 
-    unpadded_plaintext = unpad(plaintext)
+    unpadded_plaintext = unpad_data(plaintext)
 
     return unpadded_plaintext

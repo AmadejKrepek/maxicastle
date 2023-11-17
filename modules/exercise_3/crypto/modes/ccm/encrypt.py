@@ -14,18 +14,18 @@ def aes_ccm_encrypt(data, key, nonce):
     blocks = [data[i:i + block_size] for i in range(0, m, block_size)]
 
     # Counter Mode (CTR) Encryption
-    counter_bytes = b'\x00\x00\x00\x01'
-    counter_64_bit = counter_bytes + b'\x00\x00\x00\x00'
-    counter_block = nonce + counter_64_bit
 
     # Initialize tqdm for combined progress
     tqdm_combined = tqdm(total=q * 2, desc="Encrypting and XORing", unit="block")
 
     # Encrypt each block separately and XOR with the corresponding plaintext block
     encrypted_blocks = []
-    for _ in range(q):
+    for i in range(q):
+        counter_64_bit = i.to_bytes(8, byteorder='big')
+        counter_block = nonce + counter_64_bit
+
         encrypted_block = aes.encrypt(counter_block)
-        ciphertext_block = bytes(x ^ y for x, y in zip(encrypted_block, blocks[_]))
+        ciphertext_block = bytes(x ^ y for x, y in zip(encrypted_block, blocks[i]))
         encrypted_blocks.append(ciphertext_block)
         tqdm_combined.update(2)  # Update progress for both encryption and XOR
 

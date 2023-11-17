@@ -17,15 +17,15 @@ def aes_ccm_decrypt(ciphertext, key, nonce):
     blocks = [ciphertext[i:i + block_size] for i in range(0, m, block_size)]
 
     # Counter Mode (CTR) Decryption
-    counter_bytes = b'\x00\x00\x00\x01'
-    counter_64_bit = counter_bytes + b'\x00\x00\x00\x00'
-    counter_block = nonce + counter_64_bit
 
-    # Decrypt each block separately
-    decrypted_blocks = []
+    # Initialize tqdm for decryption progress
     with tqdm(total=len(blocks), desc='Decrypting', unit='blocks') as pbar:
-        for block in blocks:
-            decrypted_block = bytes(x ^ y for x, y in zip(aes.encrypt(counter_block), block))
+        decrypted_blocks = []
+        for i in range(q):
+            counter_64_bit = i.to_bytes(8, byteorder='big')
+            counter_block = nonce + counter_64_bit
+
+            decrypted_block = bytes(x ^ y for x, y in zip(aes.encrypt(counter_block), blocks[i]))
             decrypted_blocks.append(decrypted_block)
             pbar.update(1)
 

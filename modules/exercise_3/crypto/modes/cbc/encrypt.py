@@ -11,7 +11,6 @@ def aes_cbc_encrypt(data, key, iv):
     padded_data = pad_data(data, block_size)
     blocks = [padded_data[i:i + block_size] for i in range(0, len(padded_data), block_size)]
 
-    # Cipher Block Chaining
     ciphertext = b''
     previous_block = iv
     with tqdm(total=len(blocks), desc='Encrypting', unit='blocks') as pbar:
@@ -20,6 +19,6 @@ def aes_cbc_encrypt(data, key, iv):
             encrypted_block = aes.encrypt(xored_block)
             ciphertext += bytes(encrypted_block)
             previous_block = encrypted_block
-            pbar.update(1)  # Update the progress bar
+            pbar.update(1)
 
     return ciphertext

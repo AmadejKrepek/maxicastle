@@ -27,7 +27,7 @@ def aes_ccm_decrypt(ciphertext, key, nonce):
         for block in blocks:
             decrypted_block = bytes(x ^ y for x, y in zip(aes.encrypt(counter_block), block))
             decrypted_blocks.append(decrypted_block)
-            pbar.update(1)  # Update the progress bar
+            pbar.update(1)
 
     # Combine decrypted blocks to get the plaintext
     plaintext = b''.join(decrypted_blocks)

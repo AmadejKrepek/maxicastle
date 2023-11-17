@@ -12,7 +12,6 @@ def aes_ecb_encrypt(data, key):
     padded_data = pad_data(data, block_size)
     blocks = [padded_data[i:i + block_size] for i in range(0, len(padded_data), block_size)]
 
-    # Electronic Codebook
     ciphertext = b''
     with tqdm(total=len(blocks), desc='Encrypting', unit='blocks') as pbar:
         for block in blocks:

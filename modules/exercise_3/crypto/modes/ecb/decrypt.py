@@ -16,7 +16,7 @@ def aes_ecb_decrypt(ciphertext, key):
         for block in blocks:
             decrypted_block = aes.decrypt(block)
             plaintext += bytes(decrypted_block)
-            pbar.update(1)  # Update the progress bar
+            pbar.update(1)
 
     unpadded_plaintext = unpad(plaintext)
 

@@ -1,38 +1,35 @@
 import pyaes
 from tqdm import tqdm
 
+from modules.exercise_3.crypto.modes.counter.encrypt import aes_ctr_encrypt, aes_ctr_encrypt_ccm
+from modules.exercise_3.crypto.utils.utils import pad_data, pad
+
+
+def calculate_cbc_mac(data):
+    block_size = 16
+    iv = [0] * 16
+    padded_data = pad_data(data, block_size)
+
+    blocks = [padded_data[i:i + block_size] for i in range(0, len(padded_data), block_size)]
+
+    cbc_mac_operation = iv
+
+    with tqdm(total=len(blocks), desc='Calculating MAC', unit='blocks') as pbar:
+        for block in blocks:
+            xored_block = bytes(x ^ y for x, y in zip(block, cbc_mac_operation))
+            cbc_mac_operation = xored_block
+            pbar.update(1)
+
+    return cbc_mac_operation
+
 
 def aes_ccm_encrypt(data, key, nonce):
-    aes = pyaes.AES(key)
-    block_size = 16
-    m = len(data)
+    mac = calculate_cbc_mac(data)
 
-    # Calculate the number of blocks needed
-    q = (m - 1) // block_size + 1
+    increased_nonce = nonce + bytes(8)
 
-    # Divide the data into blocks
-    blocks = [data[i:i + block_size] for i in range(0, m, block_size)]
+    mac_encrypted = bytes(x ^ y for x, y in zip(increased_nonce, mac))
 
-    # Counter Mode (CTR) Encryption
-
-    # Initialize tqdm for combined progress
-    tqdm_combined = tqdm(total=q * 2, desc="Encrypting and XORing", unit="block")
-
-    # Encrypt each block separately and XOR with the corresponding plaintext block
-    encrypted_blocks = []
-    for i in range(q):
-        counter_64_bit = i.to_bytes(8, byteorder='big')
-        counter_block = nonce + counter_64_bit
-
-        encrypted_block = aes.encrypt(counter_block)
-        ciphertext_block = bytes(x ^ y for x, y in zip(encrypted_block, blocks[i]))
-        encrypted_blocks.append(ciphertext_block)
-        tqdm_combined.update(2)  # Update progress for both encryption and XOR
-
-    # Close tqdm for combined progress
-    tqdm_combined.close()
-
-    # Combine encrypted blocks to get the ciphertext
-    ciphertext = b''.join(encrypted_blocks)
+    ciphertext = aes_ctr_encrypt_ccm(data, key, nonce, mac_encrypted)
 
     return ciphertext

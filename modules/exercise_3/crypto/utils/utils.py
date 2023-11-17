@@ -13,10 +13,12 @@ def generateIV():
     return iv
 
 
-def pad(m):
-    pad_length = 16 - len(m) % 16
-    padding = bytes([pad_length] * pad_length)
-    return m + padding
+def pad(text):
+    padding_len = 16 - (len(text) % 16)
+    for i in range(padding_len):
+        text += bytes([padding_len])
+    return text
+
 
 def pad_data(data, block_size):
     padding_size = block_size - (len(data) % block_size)
@@ -29,6 +31,7 @@ def pad_data(data, block_size):
 def unpad_data(data):
     padding_size = data[-1]
     return data[:-padding_size]
+
 
 def unpad(padded_message):
     # Extract the last byte to determine the length of the padding
@@ -49,8 +52,6 @@ def unpad(padded_message):
     unpadded_message = padded_message[:-pad_length]
 
     return unpadded_message
-
-
 
 
 def split_blocks(data, block_size):

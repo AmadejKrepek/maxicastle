@@ -79,7 +79,7 @@ def create_tab3_controls(tab1):
 
     def update_iv_label(*args):
         selected_mode = get_selected_modes(ecb_var, cbc_var, ccm_var, ctr_var)
-        if selected_mode in [MODE_CTR, MODE_CCM]:
+        if selected_mode in [MODE_CTR]:
             iv_label_text = "Nonce file path"
         else:
             iv_label_text = "IV file path"

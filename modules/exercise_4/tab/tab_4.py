@@ -10,6 +10,10 @@ def generate_salt(length=16):
     return os.urandom(length)
 
 
+def generate_key(length=32):
+    return os.urandom(length)
+
+
 def sha256_hash(password, salt):
     hashed_password = hashlib.sha256(salt + password.encode('utf-8')).hexdigest()
     return hashed_password
@@ -59,55 +63,61 @@ def create_tab4_controls(tab4):
     def calculate_hashes():
         password = password_entry.get()
         salt = generate_salt()
-
         sha256_result.set(sha256_hash(password, salt))
 
     def calculate_hmac():
         key = hmac_key_entry.get()
-        message = hmac_message_entry.get()
+        message = password_entry.get()  # Use the same input for HMAC message
         hmac_result.set(generate_hmac(key.encode('utf-8'), message))
 
     def calculate_pbkdf2():
-        password = pbkdf2_password_entry.get()
+        password = password_entry.get()
         salt = generate_salt()
-
         pbkdf2_result.set(pbkdf2(password, salt))
+
+    def generate_salt_and_key():
+        salt_entry.delete(0, tk.END)
+        salt_entry.insert(0, generate_salt().hex())
+
+        hmac_key_entry.delete(0, tk.END)
+        hmac_key_entry.insert(0, generate_key().hex())
 
     # UI controls on Tab 4
     ttk.Label(tab4, text="Password:").grid(column=0, row=0, padx=10, pady=10)
     password_entry = ttk.Entry(tab4, show="*")
     password_entry.grid(column=1, row=0, padx=10, pady=10)
 
-    ttk.Label(tab4, text="SHA-256 Result:").grid(column=0, row=1, padx=10, pady=10)
+    ttk.Button(tab4, text="Generate Salt & Key", command=generate_salt_and_key).grid(column=0, row=2, columnspan=2, pady=10)
+
+    ttk.Label(tab4, text="Salt:").grid(column=0, row=3, padx=10, pady=10)
+    salt_entry = ttk.Entry(tab4)
+    salt_entry.grid(column=1, row=3, padx=10, pady=10)
+
+    ttk.Label(tab4, text="SHA-256 Result:").grid(column=0, row=4, padx=10, pady=10)
     sha256_result = tk.StringVar()
-    ttk.Label(tab4, textvariable=sha256_result).grid(column=1, row=1, padx=10, pady=10)
+    ttk.Label(tab4, textvariable=sha256_result).grid(column=1, row=4, padx=10, pady=10)
 
-    ttk.Button(tab4, text="Calculate Hashes", command=calculate_hashes).grid(column=0, row=3, columnspan=2, pady=10)
+    ttk.Button(tab4, text="Calculate Hashes", command=calculate_hashes).grid(column=0, row=5, columnspan=2, pady=10)
 
-    ttk.Separator(tab4, orient=tk.HORIZONTAL).grid(column=0, row=4, columnspan=2, sticky="ew", pady=10)
+    ttk.Separator(tab4, orient=tk.HORIZONTAL).grid(column=0, row=6, columnspan=2, sticky="ew", pady=10)
 
-    ttk.Label(tab4, text="HMAC Key:").grid(column=0, row=5, padx=10, pady=10)
+    ttk.Label(tab4, text="HMAC Key:").grid(column=0, row=7, padx=10, pady=10)
     hmac_key_entry = ttk.Entry(tab4)
-    hmac_key_entry.grid(column=1, row=5, padx=10, pady=10)
+    hmac_key_entry.grid(column=1, row=7, padx=10, pady=10)
 
-    ttk.Label(tab4, text="HMAC Message:").grid(column=0, row=6, padx=10, pady=10)
-    hmac_message_entry = ttk.Entry(tab4)
-    hmac_message_entry.grid(column=1, row=6, padx=10, pady=10)
+    ttk.Label(tab4, text="HMAC Message:").grid(column=0, row=8, padx=10, pady=10)
+    ttk.Label(tab4, text="Uses the same input as Password").grid(column=1, row=8, padx=10, pady=10)
 
-    ttk.Label(tab4, text="HMAC Result:").grid(column=0, row=7, padx=10, pady=10)
+    ttk.Label(tab4, text="HMAC Result:").grid(column=0, row=9, padx=10, pady=10)
     hmac_result = tk.StringVar()
-    ttk.Label(tab4, textvariable=hmac_result).grid(column=1, row=7, padx=10, pady=10)
+    ttk.Label(tab4, textvariable=hmac_result).grid(column=1, row=9, padx=10, pady=10)
 
-    ttk.Button(tab4, text="Calculate HMAC", command=calculate_hmac).grid(column=0, row=8, columnspan=2, pady=10)
+    ttk.Button(tab4, text="Calculate HMAC", command=calculate_hmac).grid(column=0, row=10, columnspan=2, pady=10)
 
-    ttk.Separator(tab4, orient=tk.HORIZONTAL).grid(column=0, row=9, columnspan=2, sticky="ew", pady=10)
+    ttk.Separator(tab4, orient=tk.HORIZONTAL).grid(column=0, row=11, columnspan=2, sticky="ew", pady=10)
 
-    ttk.Label(tab4, text="PBKDF2 Password:").grid(column=0, row=10, padx=10, pady=10)
-    pbkdf2_password_entry = ttk.Entry(tab4, show="*")
-    pbkdf2_password_entry.grid(column=1, row=10, padx=10, pady=10)
-
-    ttk.Label(tab4, text="PBKDF2 Result:").grid(column=0, row=11, padx=10, pady=10)
+    ttk.Label(tab4, text="PBKDF2 Result:").grid(column=0, row=12, padx=10, pady=10)
     pbkdf2_result = tk.StringVar()
-    ttk.Label(tab4, textvariable=pbkdf2_result).grid(column=1, row=11, padx=10, pady=10)
+    ttk.Label(tab4, textvariable=pbkdf2_result).grid(column=1, row=12, padx=10, pady=10)
 
-    ttk.Button(tab4, text="Calculate PBKDF2", command=calculate_pbkdf2).grid(column=0, row=12, columnspan=2, pady=10)
+    ttk.Button(tab4, text="Calculate PBKDF2", command=calculate_pbkdf2).grid(column=0, row=13, columnspan=2, pady=10)

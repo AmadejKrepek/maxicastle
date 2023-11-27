@@ -53,6 +53,7 @@ def generate_hmac(key, message):
     return outer_hash
 
 
+
 def pbkdf2(password, salt, iterations=10000, key_length=32):
     derived_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, iterations, key_length)
     return binascii.hexlify(derived_key).decode('utf-8')

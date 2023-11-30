@@ -34,7 +34,7 @@ def create_tabs(root):
     ttk.Label(tab1, text="Hill Cipher", font=("Helvetica", 16, "bold")).grid(column=0, row=0, padx=60, pady=30, columnspan=2)
     ttk.Label(tab2, text="ChaCha20", font=("Helvetica", 16, "bold")).grid(column=0, row=0, padx=60, pady=30, columnspan=2)
     ttk.Label(tab3, text="AES", font=("Helvetica", 16, "bold")).grid(column=0, row=0, padx=60, pady=30, columnspan=2)
-    ttk.Label(tab4, text="HASH / MAP", font=("Helvetica", 16, "bold")).grid(column=0, row=0, padx=60, pady=30, columnspan=2)
+    ttk.Label(tab4, text="HASH", font=("Helvetica", 16, "bold")).grid(column=0, row=0, padx=60, pady=30, columnspan=2)
 
     create_tab1_controls(tab1)
     create_tab2_controls(tab2)

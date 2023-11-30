@@ -1,124 +1,109 @@
 import tkinter as tk
 from tkinter import ttk
 import hashlib
-import hmac
 import os
-import binascii
+import struct
 
 
-def generate_salt(length=16):
-    return os.urandom(length)
+def sha256(message):
+    return hashlib.sha256(message).digest()
 
 
-def generate_key(length=32):
-    return os.urandom(length)
-
-
-def sha256_hash(password, salt):
-    hashed_password = hashlib.sha256(salt + password.encode('utf-8')).hexdigest()
-    return hashed_password
-
-
-def sha512_hash(password, salt):
-    hashed_password = hashlib.sha512(salt + password.encode('utf-8')).hexdigest()
-    return hashed_password
-
-
-def xor_bytes(b1, b2):
-    return bytes(x ^ y for x, y in zip(b1, b2))
-
-
-def generate_hmac(key, message):
-    block_size = 64  # Block size for SHA-256
-    opad = bytes(x ^ 0x5c for x in range(256))
-    ipad = bytes(x ^ 0x36 for x in range(256))
-
-    # Ensure the key is less than the block size
+def hmac_sha256(key, message):
+    block_size = 64
     if len(key) > block_size:
-        key = hashlib.sha256(key).digest()
+        key = sha256(key)
+    if len(key) < block_size:
+        key = key.ljust(block_size, b'\x00')
 
-    # Pad the key if it is less than the block size
-    key = key.ljust(block_size, b'\x00')
+    o_key_pad = bytes(x ^ 0x5c for x in key)
+    i_key_pad = bytes(x ^ 0x36 for x in key)
 
-    # XOR the key with ipad and opad
-    key_ipad = xor_bytes(key, ipad)
-    key_opad = xor_bytes(key, opad)
-
-    # Calculate inner hash
-    inner_hash = hashlib.sha256(key_ipad + message.encode('utf-8')).digest()
-
-    # Calculate outer hash
-    outer_hash = hashlib.sha256(key_opad + inner_hash).hexdigest()
+    inner_hash = sha256(i_key_pad + message)
+    outer_hash = sha256(o_key_pad + inner_hash)
 
     return outer_hash
 
 
+def pbkdf2(password, salt, iterations, dklen):
+    hlen = len(sha256(b''))  # SHA-256 hash length
+    c = (dklen + hlen - 1) // hlen
 
-def pbkdf2(password, salt, iterations=10000, key_length=32):
-    derived_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, iterations, key_length)
-    return binascii.hexlify(derived_key).decode('utf-8')
+    derived_key = b''
+    for i in range(1, c + 1):
+        u = prf_hmac_sha256(password, salt + struct.pack('>I', i))
+        derived_key += u
+
+    return derived_key[:dklen]
+
+
+def prf_hmac_sha256(key, data):
+    return hmac_sha256(key, data)
 
 
 def create_tab4_controls(tab4):
-    # Functions for UI controls on Tab 4
-    def calculate_hashes():
-        password = password_entry.get()
-        salt = generate_salt()
-        sha256_result.set(sha256_hash(password, salt))
+    # Password entry
+    password_label = ttk.Label(tab4, text="Password:")
+    password_label.grid(row=0, column=0, sticky=tk.W, padx=10, pady=5)
 
-    def calculate_hmac():
-        key = hmac_key_entry.get()
-        message = password_entry.get()  # Use the same input for HMAC message
-        hmac_result.set(generate_hmac(key.encode('utf-8'), message))
-
-    def calculate_pbkdf2():
-        password = password_entry.get()
-        salt = generate_salt()
-        pbkdf2_result.set(pbkdf2(password, salt))
-
-    def generate_salt_and_key():
-        salt_entry.delete(0, tk.END)
-        salt_entry.insert(0, generate_salt().hex())
-
-        hmac_key_entry.delete(0, tk.END)
-        hmac_key_entry.insert(0, generate_key().hex())
-
-    # UI controls on Tab 4
-    ttk.Label(tab4, text="Password:").grid(column=0, row=0, padx=10, pady=10)
     password_entry = ttk.Entry(tab4, show="*")
-    password_entry.grid(column=1, row=0, padx=10, pady=10)
+    password_entry.grid(row=0, column=1, padx=10, pady=5)
 
-    ttk.Button(tab4, text="Generate Salt & Key", command=generate_salt_and_key).grid(column=0, row=2, columnspan=2, pady=10)
+    # Salt entry
+    salt_label = ttk.Label(tab4, text="Salt:")
+    salt_label.grid(row=1, column=0, sticky=tk.W, padx=10, pady=5)
 
-    ttk.Label(tab4, text="Salt:").grid(column=0, row=3, padx=10, pady=10)
     salt_entry = ttk.Entry(tab4)
-    salt_entry.grid(column=1, row=3, padx=10, pady=10)
+    salt_entry.grid(row=1, column=1, padx=10, pady=5)
 
-    ttk.Label(tab4, text="SHA-256 Result:").grid(column=0, row=4, padx=10, pady=10)
-    sha256_result = tk.StringVar()
-    ttk.Label(tab4, textvariable=sha256_result).grid(column=1, row=4, padx=10, pady=10)
+    # Calculate Hash button
+    hash_button = ttk.Button(tab4, text="Calculate Hash",
+                             command=lambda: calculate_hash_tab4(tab4, password_entry.get(), salt_entry.get()))
+    hash_button.grid(row=2, column=0, columnspan=2, pady=10)
 
-    ttk.Button(tab4, text="Calculate Hashes", command=calculate_hashes).grid(column=0, row=5, columnspan=2, pady=10)
+    # Calculate HMAC button
+    hmac_button = ttk.Button(tab4, text="Calculate HMAC",
+                             command=lambda: calculate_hmac_tab4(tab4, password_entry.get(), salt_entry.get()))
+    hmac_button.grid(row=3, column=0, columnspan=2, pady=10)
 
-    ttk.Separator(tab4, orient=tk.HORIZONTAL).grid(column=0, row=6, columnspan=2, sticky="ew", pady=10)
+    # Calculate PBKDF2 button
+    pbkdf2_button = ttk.Button(tab4, text="Calculate PBKDF2",
+                               command=lambda: calculate_pbkdf2_tab4(tab4, password_entry.get(), salt_entry.get()))
+    pbkdf2_button.grid(row=4, column=0, columnspan=2, pady=10)
 
-    ttk.Label(tab4, text="HMAC Key:").grid(column=0, row=7, padx=10, pady=10)
-    hmac_key_entry = ttk.Entry(tab4)
-    hmac_key_entry.grid(column=1, row=7, padx=10, pady=10)
+    # Result labels
+    result_label = ttk.Label(tab4, text="Result:")
+    result_label.grid(row=5, column=0, sticky=tk.W, padx=10, pady=5)
 
-    ttk.Label(tab4, text="HMAC Message:").grid(column=0, row=8, padx=10, pady=10)
-    ttk.Label(tab4, text="Uses the same input as Password").grid(column=1, row=8, padx=10, pady=10)
+    result_text = tk.Text(tab4, height=10, width=40)
+    result_text.grid(row=5, column=1, padx=10, pady=5)
 
-    ttk.Label(tab4, text="HMAC Result:").grid(column=0, row=9, padx=10, pady=10)
-    hmac_result = tk.StringVar()
-    ttk.Label(tab4, textvariable=hmac_result).grid(column=1, row=9, padx=10, pady=10)
 
-    ttk.Button(tab4, text="Calculate HMAC", command=calculate_hmac).grid(column=0, row=10, columnspan=2, pady=10)
+def calculate_hash_tab4(tab, password, salt):
+    hash_result = sha256((password + salt).encode()).hex()
 
-    ttk.Separator(tab4, orient=tk.HORIZONTAL).grid(column=0, row=11, columnspan=2, sticky="ew", pady=10)
+    result_str = f"Password: {password}\nSalt: {salt}\nHash Result: {hash_result}"
 
-    ttk.Label(tab4, text="PBKDF2 Result:").grid(column=0, row=12, padx=10, pady=10)
-    pbkdf2_result = tk.StringVar()
-    ttk.Label(tab4, textvariable=pbkdf2_result).grid(column=1, row=12, padx=10, pady=10)
+    result_text = tab.winfo_children()[-1]
+    result_text.delete(1.0, tk.END)
+    result_text.insert(tk.END, result_str)
 
-    ttk.Button(tab4, text="Calculate PBKDF2", command=calculate_pbkdf2).grid(column=0, row=13, columnspan=2, pady=10)
+
+def calculate_hmac_tab4(tab, password, salt):
+    hmac_result = hmac_sha256(password.encode(), salt.encode()).hex()
+
+    result_str = f"Password: {password}\nSalt: {salt}\nHMAC Result: {hmac_result}"
+
+    result_text = tab.winfo_children()[-1]
+    result_text.delete(1.0, tk.END)
+    result_text.insert(tk.END, result_str)
+
+
+def calculate_pbkdf2_tab4(tab, password, salt):
+    derived_key = pbkdf2(password.encode(), salt.encode(), iterations=1000, dklen=32)
+
+    result_str = f"Password: {password}\nSalt: {salt}\nPBKDF2 Result: {derived_key.hex()}"
+
+    result_text = tab.winfo_children()[-1]
+    result_text.delete(1.0, tk.END)
+    result_text.insert(tk.END, result_str)

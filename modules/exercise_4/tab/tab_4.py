@@ -52,7 +52,35 @@ def generate_random_salt(length=16):
     return binascii.hexlify(os.urandom(length)).decode()
 
 
+def is_hex_string(s):
+    try:
+        int(s, 16)
+        return True
+    except ValueError:
+        return False
+
+
 def create_tab4_controls(tab4):
+    # Validation function
+    def validate_inputs():
+        password = password_entry.get()
+        key = key_entry.get()
+        salt = salt_entry.get()
+
+        if not password or not key or not salt:
+            tk.messagebox.showerror("Error", "All fields must be filled.")
+            return False
+
+        if not is_hex_string(key):
+            tk.messagebox.showerror("Error", "HMAC Key must be a valid hexadecimal string.")
+            return False
+
+        if not is_hex_string(salt):
+            tk.messagebox.showerror("Error", "Salt must be a valid hexadecimal string.")
+            return False
+
+        return True
+
     # Password entry
     password_label = ttk.Label(tab4, text="Password:")
     password_label.grid(row=0, column=0, sticky=tk.W, padx=10, pady=5)
@@ -106,7 +134,13 @@ def create_tab4_controls(tab4):
     result_text = tk.Text(tab4, height=10, width=40)
     result_text.grid(row=6, column=1, padx=10, pady=5)
 
+    # Validate inputs before calculations
+    hash_button.bind("<Button-1>", lambda event: validate_inputs())
+    hmac_button.bind("<Button-1>", lambda event: validate_inputs())
+    pbkdf2_button.bind("<Button-1>", lambda event: validate_inputs())
 
+
+# Calculate Hash function
 def calculate_hash_tab4(tab, password, salt):
     hash_result = sha256((password + salt).encode()).hex()
 
@@ -117,6 +151,7 @@ def calculate_hash_tab4(tab, password, salt):
     result_text.insert(tk.END, result_str)
 
 
+# Calculate HMAC function
 def calculate_hmac_tab4(tab, password, key):
     hmac_result = hmac_sha256(key.encode(), password.encode()).hex()
 
@@ -127,6 +162,7 @@ def calculate_hmac_tab4(tab, password, key):
     result_text.insert(tk.END, result_str)
 
 
+# Calculate PBKDF2 function
 def calculate_pbkdf2_tab4(tab, password, salt):
     derived_key = pbkdf2(password.encode(), salt.encode(), iterations=1000, dklen=32)
 

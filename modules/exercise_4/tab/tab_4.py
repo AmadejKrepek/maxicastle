@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import hashlib
 import struct
+import os
+import binascii
 
 
 def sha256(message):
@@ -42,6 +44,14 @@ def prf_hmac_sha256(key, data):
     return hmac_sha256(key, data)
 
 
+def generate_random_key(length=16):
+    return binascii.hexlify(os.urandom(length)).decode()
+
+
+def generate_random_salt(length=16):
+    return binascii.hexlify(os.urandom(length)).decode()
+
+
 def create_tab4_controls(tab4):
     # Password entry
     password_label = ttk.Label(tab4, text="Password:")
@@ -57,12 +67,22 @@ def create_tab4_controls(tab4):
     key_entry = ttk.Entry(tab4)
     key_entry.grid(row=1, column=1, padx=10, pady=5)
 
+    # Button to generate random key
+    generate_key_button = ttk.Button(tab4, text="Generate Key",
+                                     command=lambda: key_entry.insert(tk.END, generate_random_key()))
+    generate_key_button.grid(row=1, column=2, padx=10, pady=5)
+
     # Salt entry
     salt_label = ttk.Label(tab4, text="Salt:")
     salt_label.grid(row=2, column=0, sticky=tk.W, padx=10, pady=5)
 
     salt_entry = ttk.Entry(tab4)
     salt_entry.grid(row=2, column=1, padx=10, pady=5)
+
+    # Button to generate random salt
+    generate_salt_button = ttk.Button(tab4, text="Generate Salt",
+                                      command=lambda: salt_entry.insert(tk.END, generate_random_salt()))
+    generate_salt_button.grid(row=2, column=2, padx=10, pady=5)
 
     # Calculate Hash button
     hash_button = ttk.Button(tab4, text="Calculate Hash",
@@ -71,7 +91,7 @@ def create_tab4_controls(tab4):
 
     # Calculate HMAC button
     hmac_button = ttk.Button(tab4, text="Calculate HMAC",
-                             command=lambda: calculate_hmac_tab4(tab4, password_entry.get(), key_entry.get(), salt_entry.get()))
+                             command=lambda: calculate_hmac_tab4(tab4, password_entry.get(), key_entry.get()))
     hmac_button.grid(row=4, column=0, columnspan=2, pady=10)
 
     # Calculate PBKDF2 button
@@ -90,17 +110,17 @@ def create_tab4_controls(tab4):
 def calculate_hash_tab4(tab, password, salt):
     hash_result = sha256((password + salt).encode()).hex()
 
-    result_str = f"Password: {password}\nSalt: {salt}\nHash Result: {hash_result}"
+    result_str = f"Password: {password}\n\nSalt: {salt}\n\nHash Result: {hash_result}"
 
     result_text = tab.winfo_children()[-1]
     result_text.delete(1.0, tk.END)
     result_text.insert(tk.END, result_str)
 
 
-def calculate_hmac_tab4(tab, password, key, salt):
-    hmac_result = hmac_sha256(key.encode(), (password + salt).encode()).hex()
+def calculate_hmac_tab4(tab, password, key):
+    hmac_result = hmac_sha256(key.encode(), password.encode()).hex()
 
-    result_str = f"Password: {password}\nHMAC Key: {key}\nSalt: {salt}\nHMAC Result: {hmac_result}"
+    result_str = f"Password: {password}\n\nHMAC Key: {key}\n\nHMAC Result: {hmac_result}"
 
     result_text = tab.winfo_children()[-1]
     result_text.delete(1.0, tk.END)
@@ -110,7 +130,7 @@ def calculate_hmac_tab4(tab, password, key, salt):
 def calculate_pbkdf2_tab4(tab, password, salt):
     derived_key = pbkdf2(password.encode(), salt.encode(), iterations=1000, dklen=32)
 
-    result_str = f"Password: {password}\nSalt: {salt}\nPBKDF2 Result: {derived_key.hex()}"
+    result_str = f"Password: {password}\n\nSalt: {salt}\n\nPBKDF2 Result: {derived_key.hex()}"
 
     result_text = tab.winfo_children()[-1]
     result_text.delete(1.0, tk.END)

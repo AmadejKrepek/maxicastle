@@ -8,7 +8,7 @@ def create_tab5_controls(tab5):
     def generate_key_pair():
         private_key = rsa.generate_private_key(
             public_exponent=65537,
-            key_size=2048,
+            key_size=3096,
             backend=default_backend()
         )
         public_key = private_key.public_key()

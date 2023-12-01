@@ -46,9 +46,10 @@ def create_tab5_controls(tab5):
 
         return private_key, public_key
 
-    def sign_file(private_key, file_path):
+    def sign_and_save_file(private_key, file_path):
         with open(file_path, 'rb') as file:
             data = file.read()
+
         signature = private_key.sign(
             data,
             padding.PSS(
@@ -57,7 +58,46 @@ def create_tab5_controls(tab5):
             ),
             hashes.SHA256()
         )
-        return signature
+
+        # Save the data along with the signature
+        signed_data = data + b'\nSIGNATURE:' + signature
+        signed_file_path = file_path + ".signed"
+        with open(signed_file_path, 'wb') as signed_file:
+            signed_file.write(signed_data)
+
+        return signed_file_path
+
+    def verify_signed_file(public_key, signed_file_path):
+        with open(signed_file_path, 'rb') as signed_file:
+            signed_data = signed_file.read()
+
+        # Extract the original data and signature
+        data, _, signature = signed_data.partition(b'\nSIGNATURE:')
+
+        try:
+            public_key.verify(
+                signature,
+                data,
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
+
+            return True
+        except Exception as e:
+            return False
+
+    def verify_signature_action():
+        _, public_key = load_keys()
+        file_path = entry_file_path.get()
+
+        signed_file_path = file_path + ".signed"
+        if verify_signed_file(public_key, signed_file_path):
+            result_text.set("Signature is valid!")
+        else:
+            result_text.set("Signature is NOT valid!")
 
     def browse_file():
         file_path = filedialog.askopenfilename()
@@ -73,8 +113,8 @@ def create_tab5_controls(tab5):
     def sign_file_action():
         private_key, _ = load_keys()
         file_path = entry_file_path.get()
-        signature = sign_file(private_key, file_path)
-        result_text.set(f"File signed successfully!\nSignature: {signature.hex()}")
+        signed_file_path = sign_and_save_file(private_key, file_path)
+        result_text.set(f"File signed successfully!\nSigned File: {signed_file_path}")
 
     # GUI elements
     tk.Label(tab5, text="File Path:").grid(row=0, column=0, padx=10, pady=10)
@@ -84,6 +124,7 @@ def create_tab5_controls(tab5):
 
     tk.Button(tab5, text="Generate Keys", command=generate_keys_action).grid(row=1, column=0, columnspan=3, pady=10)
     tk.Button(tab5, text="Sign File", command=sign_file_action).grid(row=2, column=0, columnspan=3, pady=10)
+    tk.Button(tab5, text="Verify Signature", command=verify_signature_action).grid(row=5, column=0, columnspan=3, pady=10)
 
     tk.Label(tab5, text="Result:").grid(row=3, column=0, padx=10, pady=10)
     result_text = tk.StringVar()
